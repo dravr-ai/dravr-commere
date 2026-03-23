@@ -25,7 +25,7 @@ Standalone multi-tenant push notification service with dispatch pipeline, prefer
 
 ```toml
 [dependencies]
-dravr-commere = { git = "https://github.com/dravr-ai/dravr-commere.git", tag = "v0.0.1" }
+dravr-commere = "0.0.2"
 ```
 
 ```rust
