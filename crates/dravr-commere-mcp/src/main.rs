@@ -7,64 +7,44 @@
 use std::sync::Arc;
 
 use clap::Parser;
+use dravr_tronc::server::cli::McpArgs;
+use tokio::sync::RwLock;
 use tracing::info;
 
-use dravr_commere_mcp::state::create_shared_state;
-use dravr_commere_mcp::transport::http::HttpTransport;
-use dravr_commere_mcp::transport::stdio::StdioTransport;
-use dravr_commere_mcp::transport::McpTransport;
-use dravr_commere_mcp::{build_tool_registry, McpServer};
+use dravr_commere_mcp::state::ServerState;
 
+/// dravr-commere-mcp — MCP server exposing push notification operations
 #[derive(Parser)]
-#[command(
-    name = "dravr-commere-mcp",
-    version,
-    about = "Push notification MCP server"
-)]
+#[command(name = "dravr-commere-mcp", version, about)]
 struct Cli {
-    /// Transport mode: stdio or http
-    #[arg(long, default_value = "stdio")]
-    transport: String,
-
-    /// HTTP host (only for http transport)
-    #[arg(long, default_value = "127.0.0.1")]
-    host: String,
-
-    /// HTTP port (only for http transport)
-    #[arg(long, default_value = "3200")]
-    port: u16,
+    #[command(flatten)]
+    server: McpArgs,
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
-        )
-        .with_writer(std::io::stderr)
-        .init();
-
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let cli = Cli::parse();
+    dravr_tronc::server::tracing_init::init(&cli.server.transport);
 
-    let state = create_shared_state();
-    let tools = build_tool_registry();
-    let server = Arc::new(McpServer::new(state, tools));
+    let state = Arc::new(RwLock::new(ServerState::new()));
+    let registry = dravr_commere_mcp::build_tool_registry();
+    let server = Arc::new(dravr_tronc::McpServer::new(
+        "dravr-commere-mcp",
+        env!("CARGO_PKG_VERSION"),
+        registry,
+        state,
+    ));
 
     info!(
-        "Starting dravr-commere MCP server (transport: {})",
-        cli.transport
+        transport = %cli.server.transport,
+        "Starting dravr-commere MCP server"
     );
 
-    match cli.transport.as_str() {
-        "stdio" => StdioTransport.serve(server).await?,
+    match cli.server.transport.as_str() {
+        "stdio" => dravr_tronc::mcp::transport::stdio::run(server).await?,
         "http" => {
-            HttpTransport {
-                host: cli.host,
-                port: cli.port,
-            }
-            .serve(server)
-            .await?;
+            dravr_tronc::mcp::transport::http::serve(server, &cli.server.host, cli.server.port)
+                .await?;
         }
         other => {
             eprintln!("Unknown transport: {other}. Use 'stdio' or 'http'.");

@@ -195,12 +195,11 @@ dravr-commere/
 │       └── postgres.rs            # PostgreSQL backend (~1,100 LOC)
 │
 ├── crates/
-│   ├── dravr-commere-mcp/         # MCP server (JSON-RPC 2.0, stdio + HTTP)
-│   │   ├── src/server.rs          # JSON-RPC router (initialize, tools/list, tools/call)
-│   │   ├── src/tools/             # McpTool trait + ToolRegistry
-│   │   └── src/transport/         # StdioTransport, HttpTransport
+│   ├── dravr-commere-mcp/         # MCP server (library + binary crate, powered by dravr-tronc)
+│   │   ├── src/state.rs           # SharedState with notification config
+│   │   └── src/tools/             # Domain-specific MCP tool implementations
 │   │
-│   └── dravr-commere-server/      # Unified REST API + MCP server
+│   └── dravr-commere-server/      # Unified REST API + MCP server (binary crate, powered by dravr-tronc)
 │       ├── src/router.rs          # Axum routes (/health, /mcp)
 │       ├── src/auth.rs            # Bearer token middleware
 │       └── src/main.rs            # CLI (serve, stdio)

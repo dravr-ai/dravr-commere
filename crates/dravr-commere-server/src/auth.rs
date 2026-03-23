@@ -1,37 +1,21 @@
 // ABOUTME: Bearer token authentication middleware for REST API
-// ABOUTME: Validates COMMERE_API_TOKEN from request Authorization header
+// ABOUTME: Delegates to dravr-tronc shared auth with COMMERE_API_TOKEN env var
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 // Copyright (c) 2026 dravr.ai
 
 use axum::extract::Request;
-use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::Response;
 
+/// Environment variable name for the API key
+const API_KEY_ENV: &str = "COMMERE_API_TOKEN";
+
 /// Bearer token authentication middleware.
 ///
-/// If `expected_token` is `None`, all requests are allowed (auth disabled).
-/// Otherwise, validates the `Authorization: Bearer <token>` header.
-pub async fn auth_middleware(
-    request: Request,
-    next: Next,
-    expected_token: Option<String>,
-) -> Result<Response, StatusCode> {
-    let Some(token) = expected_token else {
-        // Auth disabled — pass through
-        return Ok(next.run(request).await);
-    };
-
-    let auth_header = request
-        .headers()
-        .get("authorization")
-        .and_then(|v| v.to_str().ok());
-
-    match auth_header {
-        Some(header) if header.strip_prefix("Bearer ").is_some_and(|t| t == token) => {
-            Ok(next.run(request).await)
-        }
-        _ => Err(StatusCode::UNAUTHORIZED),
-    }
+/// Delegates to `dravr_tronc::server::auth::require_auth` with the
+/// `COMMERE_API_TOKEN` environment variable. If the variable is not set,
+/// all requests pass through (development mode).
+pub async fn require_auth(request: Request, next: Next) -> Response {
+    dravr_tronc::server::auth::require_auth(API_KEY_ENV, request, next).await
 }

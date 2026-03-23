@@ -1,5 +1,5 @@
 // ABOUTME: Unified REST API + MCP server library for dravr-commere
-// ABOUTME: Re-exports router, health, auth, and state modules
+// ABOUTME: Re-exports router, health, and auth modules
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 // Copyright (c) 2026 dravr.ai

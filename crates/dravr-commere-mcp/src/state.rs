@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use tokio::sync::RwLock;
 
-/// Thread-safe shared state type alias
+/// Type alias for the shared state handle used across the server
 pub type SharedState = Arc<RwLock<ServerState>>;
 
 /// Server state holding notification service configuration
@@ -41,10 +41,4 @@ impl Default for ServerState {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Create a new shared state instance
-#[must_use]
-pub fn create_shared_state() -> SharedState {
-    Arc::new(RwLock::new(ServerState::new()))
 }

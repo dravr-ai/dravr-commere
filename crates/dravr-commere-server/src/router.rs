@@ -6,30 +6,35 @@
 
 use std::sync::Arc;
 
-use axum::extract::State;
-use axum::Json;
+use axum::middleware;
 use axum::Router;
 
-use dravr_commere_mcp::protocol::{JsonRpcRequest, JsonRpcResponse};
-use dravr_commere_mcp::server::McpServer;
+use dravr_commere_mcp::state::SharedState;
 
+use crate::auth;
 use crate::health::health_check;
 
-/// Shared application state for route handlers
-type AppState = Arc<McpServer>;
-
 /// Build the application router with all routes
-pub fn build_router(mcp_server: Arc<McpServer>) -> Router {
+///
+/// Routes:
+/// - `GET /health` — Server health check
+/// - `POST /mcp` — MCP Streamable HTTP (JSON-RPC 2.0, via dravr-tronc)
+///
+/// The auth middleware is applied to all routes. It only enforces
+/// authentication when `COMMERE_API_TOKEN` is set.
+pub fn build_router(state: SharedState) -> Router {
+    let mcp_server = Arc::new(dravr_tronc::McpServer::new(
+        "dravr-commere",
+        env!("CARGO_PKG_VERSION"),
+        dravr_commere_mcp::build_tool_registry(),
+        Arc::clone(&state),
+    ));
+
+    let mcp_router = dravr_tronc::mcp::transport::http::mcp_router(mcp_server);
+
     Router::new()
         .route("/health", axum::routing::get(health_check))
-        .route("/mcp", axum::routing::post(handle_mcp))
-        .with_state(mcp_server)
-}
-
-async fn handle_mcp(
-    State(server): State<AppState>,
-    Json(request): Json<JsonRpcRequest>,
-) -> Json<JsonRpcResponse> {
-    let response = server.handle_request(request).await;
-    Json(response)
+        .with_state(state)
+        .merge(mcp_router)
+        .layer(middleware::from_fn(auth::require_auth))
 }

@@ -4,18 +4,10 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 // Copyright (c) 2026 dravr.ai
 
-use axum::http::StatusCode;
-use axum::Json;
-use serde_json::{json, Value};
+use axum::response::IntoResponse;
 
 /// Health check handler returning server status
-pub async fn health_check() -> (StatusCode, Json<Value>) {
-    (
-        StatusCode::OK,
-        Json(json!({
-            "status": "ok",
-            "service": "dravr-commere",
-            "version": env!("CARGO_PKG_VERSION")
-        })),
-    )
+pub async fn health_check() -> impl IntoResponse {
+    dravr_tronc::server::health::HealthResponse::ok("dravr-commere", env!("CARGO_PKG_VERSION"))
+        .into_axum_response()
 }
