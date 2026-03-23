@@ -9,7 +9,7 @@ members = [".", "crates/dravr-commere-mcp", "crates/dravr-commere-server"]
 
 [package]
 name = "dravr-commere"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Multi-tenant push notification service — dispatch pipeline, preference-driven delivery, scheduling, and Expo Push"
