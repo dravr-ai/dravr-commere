@@ -1,0 +1,43 @@
+# ABOUTME: MCP server crate exposing notification service via Model Context Protocol
+# ABOUTME: Supports stdio and HTTP transports with notification management tools
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+# Copyright (c) 2026 dravr.ai
+
+[package]
+name = "dravr-commere-mcp"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "MCP server for dravr-commere notification service — expose push notifications via Model Context Protocol"
+repository = "https://github.com/dravr-ai/dravr-commere"
+readme = "README.md"
+keywords = ["mcp", "notifications", "push", "json-rpc", "expo"]
+categories = ["web-programming", "development-tools"]
+publish = false
+
+[lib]
+name = "dravr_commere_mcp"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dravr-commere-mcp"
+path = "src/main.rs"
+
+[dependencies]
+dravr-commere = { path = "../..", version = "0.1.0" }
+async-trait = "0.1"
+axum = "0.8"
+clap = { version = "4", features = ["derive"] }
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+
+[lints]
+workspace = true

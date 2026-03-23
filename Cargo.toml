@@ -1,0 +1,114 @@
+# ABOUTME: Standalone multi-tenant push notification service with dispatch pipeline and scheduling
+# ABOUTME: Expo Push delivery, preference-driven suppression, and cron-based recurring notifications
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+# Copyright (c) 2026 dravr.ai
+
+[workspace]
+members = [".", "crates/dravr-commere-mcp", "crates/dravr-commere-server"]
+
+[package]
+name = "dravr-commere"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Multi-tenant push notification service — dispatch pipeline, preference-driven delivery, scheduling, and Expo Push"
+repository = "https://github.com/dravr-ai/dravr-commere"
+homepage = "https://github.com/dravr-ai/dravr-commere"
+readme = "README.md"
+keywords = ["notifications", "push", "expo", "multi-tenant", "scheduling"]
+categories = ["web-programming", "asynchronous"]
+publish = false
+
+# ============================================================================
+# Build Profiles
+# ============================================================================
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# ============================================================================
+# Workspace Lint Configuration
+# ============================================================================
+# Shared across all workspace crates via [lints] workspace = true.
+# Individual crates inherit these settings automatically.
+#
+# ZERO TOLERANCE ENFORCEMENT:
+#   cargo clippy (reads this config, applies level = "deny")
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+# Base configuration: Enable clippy lint groups at DENY level
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+
+# Type conversion casts - allowed when properly validated
+cast_possible_truncation = "allow"
+cast_sign_loss = "allow"
+cast_precision_loss = "allow"
+
+# Const fn suggestions - clippy suggests const for methods that can't be const
+missing_const_for_fn = "allow"
+
+# Significant drop tightening - false positives with async lock guards
+significant_drop_tightening = "allow"
+
+# Module naming - allow repetition for clarity
+module_name_repetitions = "allow"
+
+# Multiple dependency versions - unavoidable in some transitive deps
+multiple_crate_versions = "allow"
+
+# Too many lines - repository trait impls are inherently long
+too_many_lines = "allow"
+
+# Missing errors doc - not all error returns need doc comments
+missing_errors_doc = "allow"
+
+# must_use candidate - too noisy for builders and constructors
+must_use_candidate = "allow"
+
+# return_self_not_must_use - builder pattern methods
+return_self_not_must_use = "allow"
+
+# redundant_pub_crate - explicit visibility is clearer
+redundant_pub_crate = "allow"
+
+# unnecessary_literal_bound - false positives with async trait lifetimes
+unnecessary_literal_bound = "allow"
+
+[features]
+default = ["sqlite"]
+sqlite = ["sqlx/sqlite"]
+postgresql = ["sqlx/postgres"]
+
+[lib]
+name = "dravr_commere"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = "0.10"
+cron = "0.15"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "chrono", "uuid"], default-features = false }
+thiserror = "2.0"
+tokio = { version = "1", features = ["rt", "time", "sync", "macros"] }
+tracing = "0.1"
+uuid = { version = "1.22", features = ["v4", "serde"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+serde_json = "1.0"
+
+[lints]
+workspace = true
