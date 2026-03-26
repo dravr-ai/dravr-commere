@@ -25,7 +25,7 @@ struct Cli {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let cli = Cli::parse();
-    dravr_tronc::server::tracing_init::init(&cli.server.transport);
+    dravr_tronc::server::tracing_init::init_with_notifications(&cli.server.transport);
 
     let state = Arc::new(RwLock::new(ServerState::new()));
 
