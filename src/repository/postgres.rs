@@ -31,11 +31,19 @@ fn parse_device_token_row(row: &PgRow) -> CommereResult<DeviceToken> {
         .try_get("id")
         .map_err(|e| CommereError::database(format!("Missing id: {e}")))?;
     let user_id: Uuid = row
-        .try_get("user_id")
-        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))?;
+        .try_get::<String, _>("user_id")
+        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid user_id UUID: {e}")))
+        })?;
     let tenant_id: Uuid = row
-        .try_get("tenant_id")
-        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))?;
+        .try_get::<String, _>("tenant_id")
+        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid tenant_id UUID: {e}")))
+        })?;
     let expo_push_token: String = row
         .try_get("expo_push_token")
         .map_err(|e| CommereError::database(format!("Missing expo_push_token: {e}")))?;
@@ -71,11 +79,19 @@ fn parse_preference_row(row: &PgRow) -> CommereResult<NotificationPreference> {
         .try_get("id")
         .map_err(|e| CommereError::database(format!("Missing id: {e}")))?;
     let user_id: Uuid = row
-        .try_get("user_id")
-        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))?;
+        .try_get::<String, _>("user_id")
+        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid user_id UUID: {e}")))
+        })?;
     let tenant_id: Uuid = row
-        .try_get("tenant_id")
-        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))?;
+        .try_get::<String, _>("tenant_id")
+        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid tenant_id UUID: {e}")))
+        })?;
     let category_str: String = row
         .try_get("category")
         .map_err(|e| CommereError::database(format!("Missing category: {e}")))?;
@@ -115,11 +131,19 @@ fn parse_notification_row(row: &PgRow) -> CommereResult<Notification> {
         .try_get("id")
         .map_err(|e| CommereError::database(format!("Missing id: {e}")))?;
     let user_id: Uuid = row
-        .try_get("user_id")
-        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))?;
+        .try_get::<String, _>("user_id")
+        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid user_id UUID: {e}")))
+        })?;
     let tenant_id: Uuid = row
-        .try_get("tenant_id")
-        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))?;
+        .try_get::<String, _>("tenant_id")
+        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid tenant_id UUID: {e}")))
+        })?;
     let category_str: String = row
         .try_get("category")
         .map_err(|e| CommereError::database(format!("Missing category: {e}")))?;
@@ -177,11 +201,19 @@ fn parse_scheduled_notification_row(row: &PgRow) -> CommereResult<ScheduledNotif
         .try_get("id")
         .map_err(|e| CommereError::database(format!("Missing id: {e}")))?;
     let user_id: Uuid = row
-        .try_get("user_id")
-        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))?;
+        .try_get::<String, _>("user_id")
+        .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid user_id UUID: {e}")))
+        })?;
     let tenant_id: Uuid = row
-        .try_get("tenant_id")
-        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))?;
+        .try_get::<String, _>("tenant_id")
+        .map_err(|e| CommereError::database(format!("Missing tenant_id: {e}")))
+        .and_then(|s| {
+            s.parse()
+                .map_err(|e| CommereError::database(format!("Invalid tenant_id UUID: {e}")))
+        })?;
     let notification_type: String = row
         .try_get("notification_type")
         .map_err(|e| CommereError::database(format!("Missing notification_type: {e}")))?;
