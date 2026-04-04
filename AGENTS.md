@@ -1,3 +1,15 @@
+# Commere — Push Notification Service
+
+**Multi-tenant notification dispatch** with preference-driven delivery. Core capabilities:
+- Expo Push integration for iOS/Android
+- Scheduled and immediate notification pipelines
+- User preference model with quiet hours, categories, opt-out
+- Delivery tracking and retry logic
+
+See [README.md](README.md) for tenant configuration.
+
+---
+
 ## Git Workflow: NO Pull Requests
 
 
