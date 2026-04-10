@@ -4,10 +4,16 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 // Copyright (c) 2026 dravr.ai
 
+use std::error::Error;
+use std::process;
 use std::sync::Arc;
 
 use clap::Parser;
+use dravr_tronc::mcp::transport::stdio;
 use dravr_tronc::server::cli::ServerArgs;
+use dravr_tronc::server::tracing_init;
+use dravr_tronc::McpServer;
+use tokio::net::TcpListener;
 use tokio::sync::RwLock;
 use tracing::info;
 
@@ -23,9 +29,9 @@ struct Cli {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let cli = Cli::parse();
-    dravr_tronc::server::tracing_init::init_with_notifications(&cli.server.transport);
+    tracing_init::init_with_notifications(&cli.server.transport);
 
     let state = Arc::new(RwLock::new(ServerState::new()));
 
@@ -36,18 +42,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     match cli.server.transport.as_str() {
         "stdio" => {
-            let mcp_server = Arc::new(dravr_tronc::McpServer::new(
+            let mcp_server = Arc::new(McpServer::new(
                 "dravr-commere",
                 env!("CARGO_PKG_VERSION"),
                 dravr_commere_mcp::build_tool_registry(),
                 Arc::clone(&state),
             ));
-            dravr_tronc::mcp::transport::stdio::run(mcp_server).await?;
+            stdio::run(mcp_server).await?;
         }
         "http" => {
             let app = build_router(state);
             let addr = format!("{}:{}", cli.server.host, cli.server.port);
-            let listener = tokio::net::TcpListener::bind(&addr).await?;
+            let listener = TcpListener::bind(&addr).await?;
 
             info!(address = %addr, "HTTP transport listening");
             info!("  Health: GET http://{addr}/health");
@@ -57,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
         other => {
             eprintln!("Unknown transport: {other}. Use 'http' or 'stdio'.");
-            std::process::exit(1);
+            process::exit(1);
         }
     }
 

@@ -8,6 +8,8 @@
 //!
 //! All errors are structured variants — no `anyhow!` or ad-hoc string errors.
 
+use std::fmt::Display;
+
 use thiserror::Error;
 
 /// Result type alias for notification operations
@@ -52,7 +54,7 @@ pub enum CommereError {
 
 impl CommereError {
     /// Create a database error from any displayable source
-    pub fn database(source: impl std::fmt::Display) -> Self {
+    pub fn database(source: impl Display) -> Self {
         Self::Database(source.to_string())
     }
 

@@ -5,9 +5,9 @@
 // Copyright (c) 2026 dravr.ai
 
 use axum::response::IntoResponse;
+use dravr_tronc::server::health::HealthResponse;
 
 /// Health check handler returning server status
 pub async fn health_check() -> impl IntoResponse {
-    dravr_tronc::server::health::HealthResponse::ok("dravr-commere", env!("CARGO_PKG_VERSION"))
-        .into_axum_response()
+    HealthResponse::ok("dravr-commere", env!("CARGO_PKG_VERSION")).into_axum_response()
 }

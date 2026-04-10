@@ -7,6 +7,7 @@
 use axum::extract::Request;
 use axum::middleware::Next;
 use axum::response::Response;
+use dravr_tronc::server::auth;
 
 /// Environment variable name for the API key
 const API_KEY_ENV: &str = "COMMERE_API_TOKEN";
@@ -17,5 +18,5 @@ const API_KEY_ENV: &str = "COMMERE_API_TOKEN";
 /// `COMMERE_API_TOKEN` environment variable. If the variable is not set,
 /// all requests pass through (development mode).
 pub async fn require_auth(request: Request, next: Next) -> Response {
-    dravr_tronc::server::auth::require_auth(API_KEY_ENV, request, next).await
+    auth::require_auth(API_KEY_ENV, request, next).await
 }
