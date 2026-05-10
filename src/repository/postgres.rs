@@ -156,9 +156,19 @@ fn parse_notification_row(row: &PgRow) -> CommereResult<Notification> {
     let body: String = row
         .try_get("body")
         .map_err(|e| CommereError::database(format!("Missing body: {e}")))?;
-    let data: Option<serde_json::Value> = row.try_get("data").unwrap_or(None);
+    // `data` and `actions` are stored as TEXT (JSON-stringified by
+    // create_notification), so read them as strings and parse — reading
+    // them as `serde_json::Value` would always fail the type check and
+    // silently return None.
+    let data: Option<serde_json::Value> = row
+        .try_get::<Option<String>, _>("data")
+        .unwrap_or(None)
+        .and_then(|s| serde_json::from_str(&s).ok());
     let image_url: Option<String> = row.try_get("image_url").unwrap_or(None);
-    let actions_json: Option<serde_json::Value> = row.try_get("actions").unwrap_or(None);
+    let actions_json: Option<serde_json::Value> = row
+        .try_get::<Option<String>, _>("actions")
+        .unwrap_or(None)
+        .and_then(|s| serde_json::from_str(&s).ok());
     let read_at: Option<DateTime<Utc>> = row.try_get("read_at").unwrap_or(None);
     let delivered_at: Option<DateTime<Utc>> = row.try_get("delivered_at").unwrap_or(None);
     let opened_at: Option<DateTime<Utc>> = row.try_get("opened_at").unwrap_or(None);
@@ -456,10 +466,20 @@ impl NotificationRepository for PostgresNotificationRepository {
     ) -> CommereResult<Notification> {
         let id = Uuid::new_v4();
         let now = Utc::now();
-        let actions_json = params
+        // The PG `notifications.data` and `notifications.actions` columns are
+        // declared as TEXT (see pierre-platform migration
+        // 20260311000007_usage_messaging_notifications.sql + the actions
+        // backfill in 20260401000001_notification_actions_column.sql), so
+        // binding a `serde_json::Value` directly silently writes NULL —
+        // sqlx maps Value to JSONB at the protocol level, the JSONB→TEXT
+        // cast fails, and the bind degrades to NULL with no error. Stringify
+        // first so the deep-link routing payload (`data.screen`) and the
+        // action buttons actually persist; this mirrors the SQLite repo.
+        let data_str = params.data.as_ref().map(ToString::to_string);
+        let actions_str = params
             .actions
             .as_ref()
-            .and_then(|a| serde_json::to_value(a).ok());
+            .and_then(|a| serde_json::to_string(a).ok());
 
         sqlx::query(
             r"
@@ -475,9 +495,9 @@ impl NotificationRepository for PostgresNotificationRepository {
         .bind(&params.notification_type)
         .bind(&params.title)
         .bind(&params.body)
-        .bind(&params.data)
+        .bind(&data_str)
         .bind(&params.image_url)
-        .bind(&actions_json)
+        .bind(&actions_str)
         .bind(now)
         .execute(&self.pool)
         .await
