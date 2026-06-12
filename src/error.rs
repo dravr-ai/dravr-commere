@@ -91,7 +91,7 @@ impl From<sqlx::Error> for CommereError {
 impl From<uuid::Error> for CommereError {
     fn from(err: uuid::Error) -> Self {
         Self::Validation {
-            field: "uuid".to_string(),
+            field: "uuid".to_owned(),
             reason: err.to_string(),
         }
     }
