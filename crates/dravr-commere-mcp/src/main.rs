@@ -13,7 +13,6 @@ use dravr_tronc::mcp::transport::{http, stdio};
 use dravr_tronc::server::cli::McpArgs;
 use dravr_tronc::server::tracing_init;
 use dravr_tronc::McpServer;
-use tokio::sync::RwLock;
 use tracing::info;
 
 use dravr_commere_mcp::state::ServerState;
@@ -31,7 +30,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let cli = Cli::parse();
     tracing_init::init(&cli.server.transport);
 
-    let state = Arc::new(RwLock::new(ServerState::new()));
+    let state = Arc::new(ServerState::new());
     let registry = dravr_commere_mcp::build_tool_registry();
     let server = Arc::new(McpServer::new(
         "dravr-commere-mcp",

@@ -14,7 +14,6 @@ use dravr_tronc::server::cli::ServerArgs;
 use dravr_tronc::server::tracing_init;
 use dravr_tronc::McpServer;
 use tokio::net::TcpListener;
-use tokio::sync::RwLock;
 use tracing::info;
 
 use dravr_commere_mcp::state::ServerState;
@@ -33,7 +32,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let cli = Cli::parse();
     tracing_init::init_with_notifications(&cli.server.transport);
 
-    let state = Arc::new(RwLock::new(ServerState::new()));
+    let state = Arc::new(ServerState::new());
 
     info!(
         transport = %cli.server.transport,

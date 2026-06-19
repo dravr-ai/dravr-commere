@@ -6,7 +6,7 @@
 
 [package]
 name = "dravr-commere-mcp"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "MCP server for dravr-commere notification service — expose push notifications via Model Context Protocol"
@@ -25,8 +25,8 @@ name = "dravr-commere-mcp"
 path = "src/main.rs"
 
 [dependencies]
-dravr-commere = { path = "../..", version = "0.1.6" }
-dravr-tronc = "0.3"
+dravr-commere = { path = "../..", version = "0.1.7" }
+dravr-tronc = "0.5.3"
 async-trait = "0.1"
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }

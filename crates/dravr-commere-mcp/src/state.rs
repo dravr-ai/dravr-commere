@@ -6,10 +6,8 @@
 
 use std::sync::Arc;
 
-use tokio::sync::RwLock;
-
 /// Type alias for the shared state handle used across the server
-pub type SharedState = Arc<RwLock<ServerState>>;
+pub type SharedState = Arc<ServerState>;
 
 /// Server state holding notification service configuration
 #[derive(Debug)]

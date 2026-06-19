@@ -6,7 +6,7 @@
 
 [package]
 name = "dravr-commere-server"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Unified REST API + MCP server for dravr-commere push notification service"
@@ -25,9 +25,9 @@ name = "dravr-commere-server"
 path = "src/main.rs"
 
 [dependencies]
-dravr-commere = { path = "../..", version = "0.1.6" }
-dravr-commere-mcp = { path = "../dravr-commere-mcp", version = "0.1.6" }
-dravr-tronc = { version = "0.3", features = ["notifications"] }
+dravr-commere = { path = "../..", version = "0.1.7" }
+dravr-commere-mcp = { path = "../dravr-commere-mcp", version = "0.1.7" }
+dravr-tronc = { version = "0.5.3", features = ["notifications"] }
 async-trait = "0.1"
 axum = "0.8"
 clap = { version = "4", features = ["derive"] }

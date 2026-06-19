@@ -429,7 +429,7 @@ checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
 
 [[package]]
 name = "dravr-commere"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "async-trait",
  "chrono",
@@ -447,7 +447,7 @@ dependencies = [
 
 [[package]]
 name = "dravr-commere-mcp"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "async-trait",
  "clap",
@@ -461,7 +461,7 @@ dependencies = [
 
 [[package]]
 name = "dravr-commere-server"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "async-trait",
  "axum",
@@ -479,12 +479,13 @@ dependencies = [
 
 [[package]]
 name = "dravr-tronc"
-version = "0.3.1"
+version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50438122675e0f5c2fe99407592e4db40d0fc0bf6fa37b1b4a3e4576a765f190"
+checksum = "5918d1d2a0e60b97f60b31d6a372e1e710beb1b3ff3b35599d6aede93f7ce4b2"
 dependencies = [
  "async-trait",
  "axum",
+ "bitflags",
  "chrono",
  "clap",
  "futures",

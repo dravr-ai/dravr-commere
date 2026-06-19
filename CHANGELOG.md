@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7] — 2026-06-19
+
+### Changed
+
+- deps: migrate `dravr-commere-mcp` and `dravr-commere-server` to dravr-tronc
+  0.5.3 (dual-era MCP engine); state is `Arc<S>` directly (tronc no longer wraps
+  it in a `RwLock`). The core `dravr-commere` crate is unchanged.
+
 ## [0.1.6] — 2026-05-10
 
 ### Fixed
