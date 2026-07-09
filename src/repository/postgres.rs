@@ -561,22 +561,15 @@ impl NotificationRepository for PostgresNotificationRepository {
         let unread_count: i64 = unread_row.try_get::<i64, _>("cnt").unwrap_or(0);
 
         // Get paginated results — use numbered bind params based on whether category is present
-        let (data_query, param_offset) = if category.is_some() {
-            (
-                format!(
-                    "SELECT * FROM notifications WHERE {conditions} ORDER BY created_at DESC LIMIT $4 OFFSET $5"
-                ),
-                4,
+        let data_query = if category.is_some() {
+            format!(
+                "SELECT * FROM notifications WHERE {conditions} ORDER BY created_at DESC LIMIT $4 OFFSET $5"
             )
         } else {
-            (
-                format!(
-                    "SELECT * FROM notifications WHERE {conditions} ORDER BY created_at DESC LIMIT $3 OFFSET $4"
-                ),
-                3,
+            format!(
+                "SELECT * FROM notifications WHERE {conditions} ORDER BY created_at DESC LIMIT $3 OFFSET $4"
             )
         };
-        let _ = param_offset; // used in format string via numbered placeholders
 
         let mut data_q = sqlx::query(&data_query)
             .bind(user_id.to_string())
