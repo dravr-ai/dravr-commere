@@ -11,17 +11,22 @@
 //!
 //! ## Quick Start
 //!
-//! ```rust,ignore
-//! use dravr_commere::NotificationService;
+//! ```rust,no_run
+//! use dravr_commere::service::NotificationService;
 //!
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // SQLite backend
+//! let pool = sqlx::SqlitePool::connect("sqlite::memory:").await?;
 //! let service = NotificationService::from_sqlite(pool);
 //!
-//! // PostgreSQL backend
-//! let service = NotificationService::from_postgres(pool);
+//! // PostgreSQL backend takes a PgPool the same way:
+//! //   let service = NotificationService::from_postgres(pg_pool);
 //!
 //! // Start the background scheduler
 //! let abort_handle = service.start_scheduler();
+//! # let _ = abort_handle;
+//! # Ok(())
+//! # }
 //! ```
 
 pub mod constants;
