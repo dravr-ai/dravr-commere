@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.1] — 2026-08-26
+
+### Fixed
+
+- fix(postgres): notification ids are bound and read as text on PostgreSQL.
+  Every notification table stores its id as TEXT holding a UUID string (the
+  schema dravr-platform ships for both engines, and what the SQLite
+  repository already does), but the PostgreSQL repository bound a native
+  `Uuid` for every id and decoded the id column as a native UUID, so no
+  notification row could be written or read on PostgreSQL. Surfaced by
+  dravr-platform's PostgreSQL-lane notification test.
+
 ## [0.3.0] — 2026-08-26
 
 ### Removed
