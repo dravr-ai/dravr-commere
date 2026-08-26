@@ -78,6 +78,15 @@ fn parse_device_token_row(row: &PgRow) -> CommereResult<DeviceToken> {
     })
 }
 
+/// Parse a stored quiet-hour boundary. Rows are written as `HH:MM`; rows
+/// written before 0.3.2 went through `PostgreSQL`'s time-to-text cast and
+/// carry `HH:MM:SS`, so both spellings read.
+fn parse_quiet_hour(s: &str) -> Option<NaiveTime> {
+    NaiveTime::parse_from_str(s, "%H:%M")
+        .or_else(|_| NaiveTime::parse_from_str(s, "%H:%M:%S"))
+        .ok()
+}
+
 /// Parse a notification preference row from `PostgreSQL`
 fn parse_preference_row(row: &PgRow) -> CommereResult<NotificationPreference> {
     let id: Uuid = row
@@ -105,9 +114,24 @@ fn parse_preference_row(row: &PgRow) -> CommereResult<NotificationPreference> {
         .try_get("category")
         .map_err(|e| CommereError::database(format!("Missing category: {e}")))?;
     let enabled: bool = row.try_get("enabled").unwrap_or(true);
-    let sub_prefs_json: Option<serde_json::Value> = row.try_get("sub_preferences").unwrap_or(None);
-    let quiet_start: Option<NaiveTime> = row.try_get("quiet_hours_start").unwrap_or(None);
-    let quiet_end: Option<NaiveTime> = row.try_get("quiet_hours_end").unwrap_or(None);
+    // `sub_preferences` and the quiet hours are stored as TEXT — a JSON
+    // string and `HH:MM` — on both engines, so read them as strings and
+    // parse; decoding them as `serde_json::Value` and `NaiveTime` would
+    // always fail the type check and silently return None.
+    let sub_prefs_json: Option<serde_json::Value> = row
+        .try_get::<Option<String>, _>("sub_preferences")
+        .unwrap_or(None)
+        .and_then(|s| serde_json::from_str(&s).ok());
+    let quiet_start = row
+        .try_get::<Option<String>, _>("quiet_hours_start")
+        .unwrap_or(None)
+        .as_deref()
+        .and_then(parse_quiet_hour);
+    let quiet_end = row
+        .try_get::<Option<String>, _>("quiet_hours_end")
+        .unwrap_or(None)
+        .as_deref()
+        .and_then(parse_quiet_hour);
     let timezone: Option<String> = row.try_get("timezone").unwrap_or(None);
     let max_per_day: Option<i32> = row.try_get("max_per_day").unwrap_or(None);
     let created_at: DateTime<Utc> = row
@@ -414,16 +438,9 @@ impl NotificationRepository for PostgresNotificationRepository {
     ) -> CommereResult<NotificationPreference> {
         let id = Uuid::new_v4();
         let now = Utc::now();
-        let sub_prefs_json = params.sub_preferences.clone();
-
-        let quiet_start = params
-            .quiet_hours_start
-            .as_deref()
-            .and_then(|s| NaiveTime::parse_from_str(s, "%H:%M").ok());
-        let quiet_end = params
-            .quiet_hours_end
-            .as_deref()
-            .and_then(|s| NaiveTime::parse_from_str(s, "%H:%M").ok());
+        // Stored as TEXT on both engines — the JSON string and the `HH:MM`
+        // boundary as given — so the row reads back exactly as written.
+        let sub_prefs_str = params.sub_preferences.as_ref().map(ToString::to_string);
 
         sqlx::query(
             r"
@@ -446,9 +463,9 @@ impl NotificationRepository for PostgresNotificationRepository {
         .bind(params.tenant_id.to_string())
         .bind(&params.category)
         .bind(params.enabled)
-        .bind(&sub_prefs_json)
-        .bind(quiet_start)
-        .bind(quiet_end)
+        .bind(sub_prefs_str)
+        .bind(params.quiet_hours_start.as_deref())
+        .bind(params.quiet_hours_end.as_deref())
         .bind(params.timezone.as_deref())
         .bind(params.max_per_day)
         .bind(now)
