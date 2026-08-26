@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.0] — 2026-08-26
+
+### Removed
+
+- refactor(social)!: the `Social` notification category is deleted —
+  `NotificationCategory::Social` and its `"social"` stored string, the four
+  social triggers (`trigger_friend_request_received`,
+  `trigger_friend_request_accepted`, `trigger_activity_kudos`,
+  `trigger_insight_shared`), the `kudos_received` / `friend_request`
+  feed-collapse rules, and `constants::FAN_OUT_PAGE_SIZE`. dravr-platform,
+  the only consumer, retired the Insights and Friends surfaces by deletion
+  (Chat-First Cutover), so nothing raises a social notification any more;
+  `from_str_opt("social")` now returns `None`, and the platform's migration
+  deletes the stored `social` rows before this version reads them.
+
+### Fixed
+
+- fix(hooks): the SessionStart hook arms `.build/hooks` instead of a missing
+  `.githooks`, so Claude sessions no longer run with the git hooks disabled.
+
+
 ## [0.1.7] — 2026-06-19
 
 ### Changed
