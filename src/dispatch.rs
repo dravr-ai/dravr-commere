@@ -324,20 +324,13 @@ fn log_push_delivery_result(
 
 /// Derive the iOS categoryIdentifier from notification actions
 fn derive_category_id(request: &DispatchRequest) -> String {
-    let Some(actions) = &request.actions else {
-        return request.category.as_str().to_owned();
-    };
+    let has_quick_reply = request.actions.as_ref().is_some_and(|actions| {
+        actions
+            .iter()
+            .any(|a| a.action_type == NotificationActionType::QuickReply)
+    });
 
-    let has_accept_decline = actions
-        .iter()
-        .any(|a| a.action_type == NotificationActionType::AcceptDecline);
-    let has_quick_reply = actions
-        .iter()
-        .any(|a| a.action_type == NotificationActionType::QuickReply);
-
-    if has_accept_decline {
-        "accept_decline".to_owned()
-    } else if has_quick_reply {
+    if has_quick_reply {
         "quick_reply".to_owned()
     } else {
         request.category.as_str().to_owned()

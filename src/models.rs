@@ -371,8 +371,6 @@ pub struct UpsertNotificationPreferenceParams {
 pub enum NotificationActionType {
     /// Navigate to a specific screen
     OpenScreen,
-    /// Show accept/decline buttons
-    AcceptDecline,
     /// Show a quick reply input (e.g., coach messages)
     QuickReply,
 }
