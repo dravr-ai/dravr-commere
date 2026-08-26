@@ -22,8 +22,10 @@ use uuid::Uuid;
 use super::NotificationRepository;
 
 // ════════════════════════════════════════════════════════════════
-// Helper functions for row parsing. Every id column is TEXT holding a UUID
-// string, as on SQLite; only timestamps and booleans are native PG types.
+// Helper functions for row parsing. device_tokens, notification_preferences
+// and scheduled_notifications store their id as TEXT holding a UUID string,
+// as on SQLite; notifications.id alone is a native UUID (dravr-platform's
+// 20260401000002). Timestamps and booleans are native PG types.
 // ════════════════════════════════════════════════════════════════
 
 /// Parse a device token row from `PostgreSQL` (text ids, native `TIMESTAMPTZ` and `BOOLEAN`)
@@ -160,13 +162,12 @@ fn parse_preference_row(row: &PgRow) -> CommereResult<NotificationPreference> {
 
 /// Parse a notification row from `PostgreSQL`
 fn parse_notification_row(row: &PgRow) -> CommereResult<Notification> {
+    // notifications.id is a native UUID on PostgreSQL (dravr-platform's
+    // 20260401000002 converted it); the other notification tables keep
+    // TEXT ids and read them as strings.
     let id: Uuid = row
-        .try_get::<String, _>("id")
-        .map_err(|e| CommereError::database(format!("Missing id: {e}")))
-        .and_then(|s| {
-            s.parse()
-                .map_err(|e| CommereError::database(format!("Invalid id UUID: {e}")))
-        })?;
+        .try_get("id")
+        .map_err(|e| CommereError::database(format!("Missing id: {e}")))?;
     let user_id: Uuid = row
         .try_get::<String, _>("user_id")
         .map_err(|e| CommereError::database(format!("Missing user_id: {e}")))
@@ -522,7 +523,7 @@ impl NotificationRepository for PostgresNotificationRepository {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             ",
         )
-        .bind(id.to_string())
+        .bind(id)
         .bind(params.user_id.to_string())
         .bind(params.tenant_id.to_string())
         .bind(params.category.as_str())
@@ -538,7 +539,7 @@ impl NotificationRepository for PostgresNotificationRepository {
         .map_err(|e| CommereError::database(format!("Failed to create notification: {e}")))?;
 
         let row = sqlx::query("SELECT * FROM notifications WHERE id = $1")
-            .bind(id.to_string())
+            .bind(id)
             .fetch_one(&self.pool)
             .await
             .map_err(|e| {
@@ -641,7 +642,7 @@ impl NotificationRepository for PostgresNotificationRepository {
             ",
         )
         .bind(now)
-        .bind(notification_id.to_string())
+        .bind(notification_id)
         .bind(user_id.to_string())
         .bind(tenant_id.to_string())
         .execute(&self.pool)
@@ -688,7 +689,7 @@ impl NotificationRepository for PostgresNotificationRepository {
             WHERE id = $1 AND user_id = $2 AND tenant_id = $3
             ",
         )
-        .bind(notification_id.to_string())
+        .bind(notification_id)
         .bind(user_id.to_string())
         .bind(tenant_id.to_string())
         .execute(&self.pool)
@@ -754,7 +755,7 @@ impl NotificationRepository for PostgresNotificationRepository {
             ",
         )
         .bind(now)
-        .bind(notification_id.to_string())
+        .bind(notification_id)
         .bind(user_id.to_string())
         .bind(tenant_id.to_string())
         .execute(&self.pool)
@@ -779,7 +780,7 @@ impl NotificationRepository for PostgresNotificationRepository {
             ",
         )
         .bind(now)
-        .bind(notification_id.to_string())
+        .bind(notification_id)
         .bind(user_id.to_string())
         .bind(tenant_id.to_string())
         .execute(&self.pool)
