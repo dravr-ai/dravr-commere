@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.3] — 2026-08-26
+
+### Fixed
+
+- fix(postgres): `notifications.id` is bound and decoded as a native UUID again.
+  dravr-platform's `20260401000002` converted that one column to UUID and left
+  `device_tokens`, `notification_preferences` and `scheduled_notifications`
+  with TEXT ids; 0.3.1 moved every id to text, which fixed the three TEXT
+  tables and broke the UUID one (`create_notification` and the feed mapper
+  failed on PostgreSQL). Ids now follow each table's column type.
+
 ## [0.3.2] — 2026-08-26
 
 ### Fixed
