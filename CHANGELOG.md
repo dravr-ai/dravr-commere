@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0] — 2026-08-26
+
+### Removed
+
+- refactor(actions)!: the `AcceptDecline` notification action type is deleted —
+  `NotificationActionType::AcceptDecline`, its `"accept_decline"` wire string,
+  and the iOS `categoryIdentifier` the dispatcher derived from it. The
+  friend-request trigger deleted in 0.2.0 was its only producer, so no
+  notification has carried the action since; dravr-platform drops the matching
+  shared-types union member in the same change. `OpenScreen` and `QuickReply`
+  are unchanged.
+
 ## [0.2.0] — 2026-08-26
 
 ### Removed

@@ -25,7 +25,7 @@ Standalone multi-tenant push notification service with dispatch pipeline, prefer
 
 ```toml
 [dependencies]
-dravr-commere = "0.2"
+dravr-commere = "0.3"
 ```
 
 ```rust
