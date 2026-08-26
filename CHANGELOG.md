@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2] — 2026-08-26
+
+### Fixed
+
+- fix(postgres): stored preference JSON and quiet hours are read as text on
+  PostgreSQL. `sub_preferences` and the quiet-hour boundaries are TEXT on both
+  engines; the PostgreSQL mapper decoded them as native `serde_json::Value`
+  and `NaiveTime` and hid the type failure with `unwrap_or(None)`, so every
+  preference read back without its per-type toggles and quiet hours. The
+  upsert now binds them as text too, and the read accepts the `HH:MM:SS`
+  spelling the earlier `time`-typed writes left behind.
+
 ## [0.3.1] — 2026-08-26
 
 ### Fixed
