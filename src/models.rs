@@ -163,8 +163,6 @@ pub enum NotificationCategory {
     Training,
     /// Recovery score and overtraining alerts
     Recovery,
-    /// Social interactions (friend requests, kudos)
-    Social,
     /// Coach messages and plan updates
     Coach,
     /// Personal records and milestones
@@ -184,7 +182,6 @@ impl NotificationCategory {
         &[
             Self::Training,
             Self::Recovery,
-            Self::Social,
             Self::Coach,
             Self::Achievement,
             Self::System,
@@ -199,7 +196,6 @@ impl NotificationCategory {
         match self {
             Self::Training => "training",
             Self::Recovery => "recovery",
-            Self::Social => "social",
             Self::Coach => "coach",
             Self::Achievement => "achievement",
             Self::System => "system",
@@ -214,7 +210,6 @@ impl NotificationCategory {
         match s {
             "training" => Some(Self::Training),
             "recovery" => Some(Self::Recovery),
-            "social" => Some(Self::Social),
             "coach" => Some(Self::Coach),
             "achievement" => Some(Self::Achievement),
             "system" => Some(Self::System),
@@ -376,7 +371,7 @@ pub struct UpsertNotificationPreferenceParams {
 pub enum NotificationActionType {
     /// Navigate to a specific screen
     OpenScreen,
-    /// Show accept/decline buttons (e.g., friend requests)
+    /// Show accept/decline buttons
     AcceptDecline,
     /// Show a quick reply input (e.g., coach messages)
     QuickReply,
@@ -406,7 +401,7 @@ pub struct Notification {
     pub user_id: Uuid,
     /// Tenant scope for multi-tenant isolation
     pub tenant_id: TenantId,
-    /// Notification category (training, recovery, social, etc.)
+    /// Notification category (training, recovery, coach, etc.)
     pub category: NotificationCategory,
     /// Specific notification type within the category (e.g. `activity_synced`)
     pub notification_type: String,
@@ -713,7 +708,7 @@ impl From<Notification> for NotificationItem {
 }
 
 /// Notification types eligible for collapsing in the feed
-const COLLAPSIBLE_TYPES: &[&str] = &["kudos_received", "sync_failure", "friend_request"];
+const COLLAPSIBLE_TYPES: &[&str] = &["sync_failure"];
 
 /// Collapse consecutive notifications of the same type into grouped items
 ///
@@ -755,20 +750,9 @@ pub fn collapse_notifications(items: Vec<NotificationItem>) -> Vec<NotificationI
 /// Update the title of a collapsed notification group to reflect the count
 fn update_collapsed_title(item: &mut NotificationItem) {
     let count = item.collapsed_count;
-    match item.notification_type.as_str() {
-        "kudos_received" => {
-            item.title = format!("{count} kudos received");
-            item.body = format!("You received {count} kudos recently");
-        }
-        "sync_failure" => {
-            item.title = format!("{count} sync failures");
-            item.body = format!("{count} activity syncs failed recently");
-        }
-        "friend_request" => {
-            item.title = format!("{count} friend requests");
-            item.body = format!("You have {count} pending friend requests");
-        }
-        _ => {}
+    if item.notification_type == "sync_failure" {
+        item.title = format!("{count} sync failures");
+        item.body = format!("{count} activity syncs failed recently");
     }
 }
 

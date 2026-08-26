@@ -38,12 +38,27 @@ fn all_lists_every_category_exactly_once() {
     assert_eq!(seen.len(), before, "all() must not repeat a category");
 
     // A category absent from all() is unreachable for anything that enumerates
-    // them (preference screens, fan-out), so pin the count against the eight
+    // them (preference screens, fan-out), so pin the count against the seven
     // documented kinds rather than against all().len(), which would agree with
     // itself no matter what.
     assert_eq!(
-        before, 8,
-        "expected the eight documented categories, got: {seen:?}"
+        before, 7,
+        "expected the seven documented categories, got: {seen:?}"
+    );
+}
+
+#[test]
+fn the_retired_social_category_no_longer_parses() {
+    // `social` was a stored category until 0.2.0. dravr-platform retired the
+    // Insights and Friends surfaces that raised it and its migration deleted
+    // the stored rows, so a reader that still resolved the string would
+    // resurrect a category no preference screen can render.
+    assert_eq!(NotificationCategory::from_str_opt("social"), None);
+    assert!(
+        NotificationCategory::all()
+            .iter()
+            .all(|category| category.as_str() != "social"),
+        "all() must not enumerate the retired social category"
     );
 }
 

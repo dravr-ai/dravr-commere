@@ -101,7 +101,6 @@ Outcomes:
 |----------|-------------|
 | `Training` | Activity synced, training load alerts |
 | `Recovery` | Low recovery score, overtraining warnings |
-| `Social` | Friend requests, kudos, shared insights |
 | `Coach` | Coach messages, plan updates, feedback (bypasses frequency cap) |
 | `Achievement` | Personal records, milestones, fitness improvements |
 | `System` | Sync failures, OAuth expiry |
@@ -121,10 +120,6 @@ Fire-and-forget trigger functions spawn async tasks that dispatch notifications 
 | `trigger_personal_record` | Achievement | New PR detected |
 | `trigger_milestone_reached` | Achievement | Cumulative milestone |
 | `trigger_fitness_improvement` | Achievement | FTP/VO2max improved |
-| `trigger_friend_request_received` | Social | Accept/Decline action buttons |
-| `trigger_friend_request_accepted` | Social | Connection confirmed |
-| `trigger_activity_kudos` | Social | Someone gave kudos |
-| `trigger_insight_shared` | Social | Coaching insight shared |
 | `trigger_coach_message` | Coach | Quick Reply action button |
 | `trigger_plan_updated` | Coach | Training plan changed |
 | `trigger_coach_feedback` | Coach | Note on activity |
@@ -163,7 +158,6 @@ All server configuration is loaded from environment variables (`.envrc` + direnv
 | `RUST_LOG` | `info` | Log level (`trace`, `debug`, `info`, `warn`, `error`) |
 | `NOTIFICATION_DEFAULT_MAX_PER_DAY` | `50` | Default daily cap per category |
 | `NOTIFICATION_MAX_SCHEDULES_PER_USER` | `20` | Max scheduled notifications per user |
-| `NOTIFICATION_FAN_OUT_PAGE_SIZE` | `100` | Batch size for friend fan-out queries |
 
 Example `.envrc`:
 
