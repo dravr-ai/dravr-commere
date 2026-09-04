@@ -27,7 +27,7 @@ path = "src/main.rs"
 [dependencies]
 dravr-commere = { path = "../..", version = "0.3.3" }
 dravr-commere-mcp = { path = "../dravr-commere-mcp", version = "0.3.3" }
-dravr-tronc = { version = "0.6.2", features = ["notifications"] }
+dravr-tronc = { version = "0.11.0", features = ["notifications"] }
 async-trait = "0.1"
 axum = "0.8"
 clap = { version = "4", features = ["derive"] }
