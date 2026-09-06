@@ -163,7 +163,7 @@ pub enum NotificationCategory {
     Training,
     /// Recovery score and overtraining alerts
     Recovery,
-    /// Coach messages and plan updates
+    /// Agent messages and plan updates
     Coach,
     /// Personal records and milestones
     Achievement,
@@ -371,7 +371,7 @@ pub struct UpsertNotificationPreferenceParams {
 pub enum NotificationActionType {
     /// Navigate to a specific screen
     OpenScreen,
-    /// Show a quick reply input (e.g., coach messages)
+    /// Show a quick reply input (e.g., agent messages)
     QuickReply,
 }
 

@@ -78,7 +78,7 @@ pub struct DispatchRequest {
     pub image_url: Option<String>,
     /// Action buttons attached to this notification
     pub actions: Option<Vec<NotificationAction>>,
-    /// When true, skip the daily frequency cap check (used for coach notifications)
+    /// When true, skip the daily frequency cap check (used for agent notifications)
     /// Quiet hours and category-disabled checks still apply.
     pub bypass_frequency_cap: bool,
 }

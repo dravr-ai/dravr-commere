@@ -1,4 +1,4 @@
-// ABOUTME: Notification triggers for intelligence events, coach communications, and provider failures
+// ABOUTME: Notification triggers for intelligence events, agent communications, and provider failures
 // ABOUTME: All fire-and-forget via tokio::spawn — failures logged at WARN, never block the caller
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
@@ -200,10 +200,10 @@ pub fn trigger_fitness_improvement(
 }
 
 // ============================================================================
-// Coach Triggers (bypass frequency cap)
+// Agent Triggers (bypass frequency cap)
 // ============================================================================
 
-/// Trigger notification when a coach sends a message to an athlete.
+/// Trigger notification when an agent sends a message to an athlete.
 pub fn trigger_coach_message(
     service: &Arc<NotificationService>,
     athlete_id: Uuid,
@@ -216,7 +216,7 @@ pub fn trigger_coach_message(
         tenant_id,
         category: NotificationCategory::Coach,
         notification_type: "coach_message".to_owned(),
-        title: "Message from your coach".to_owned(),
+        title: "Message from your agent".to_owned(),
         body: format!("{coach_name} sent you a message"),
         data: Some(json!({ "screen": "coach", "action": "chat", "id": conversation_id })),
         image_url: None,
@@ -230,7 +230,7 @@ pub fn trigger_coach_message(
     spawn_dispatch(Arc::clone(service), request);
 }
 
-/// Trigger notification when a coach updates an athlete's training plan.
+/// Trigger notification when an agent updates an athlete's training plan.
 pub fn trigger_plan_updated(
     service: &Arc<NotificationService>,
     athlete_id: Uuid,
@@ -252,7 +252,7 @@ pub fn trigger_plan_updated(
     spawn_dispatch(Arc::clone(service), request);
 }
 
-/// Trigger notification when a coach leaves feedback on an athlete's activity.
+/// Trigger notification when an agent leaves feedback on an athlete's activity.
 pub fn trigger_coach_feedback(
     service: &Arc<NotificationService>,
     athlete_id: Uuid,
@@ -266,7 +266,7 @@ pub fn trigger_coach_feedback(
         tenant_id,
         category: NotificationCategory::Coach,
         notification_type: "coach_feedback".to_owned(),
-        title: "Coach feedback".to_owned(),
+        title: "Agent feedback".to_owned(),
         body: format!("{coach_name} left a note on your {activity_type}"),
         data: Some(json!({ "screen": "activity", "id": activity_id })),
         image_url: None,

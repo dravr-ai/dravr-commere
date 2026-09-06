@@ -101,7 +101,7 @@ Outcomes:
 |----------|-------------|
 | `Training` | Activity synced, training load alerts |
 | `Recovery` | Low recovery score, overtraining warnings |
-| `Coach` | Coach messages, plan updates, feedback (bypasses frequency cap) |
+| `Coach` | Agent messages, plan updates, feedback (bypasses frequency cap) |
 | `Achievement` | Personal records, milestones, fitness improvements |
 | `System` | Sync failures, OAuth expiry |
 | `Ai` | AI-generated insights and recommendations |
